@@ -3,6 +3,7 @@ import routes from "./routes/tasks.route.mjs";
 import { connectDB } from "./db/connect.db.mjs";
 const app = express();
 
+app.use(express.static("./public"));
 app.use(express.json());
 
 app.use("/api/v1/tasks", routes);
