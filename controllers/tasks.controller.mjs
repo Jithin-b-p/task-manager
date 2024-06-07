@@ -1,3 +1,4 @@
+import { createCustomError } from "../errors/custom-error.mjs";
 import { asyncWrapper } from "../middleware/async.mjs";
 import Task from "../models/task.model.mjs";
 
@@ -18,7 +19,7 @@ export const createTask = asyncWrapper(async (req, res) => {
   res.status(201).json({ task });
 });
 
-export const updateTask = asyncWrapper(async (req, res) => {
+export const updateTask = asyncWrapper(async (req, res, next) => {
   const { id } = req.params;
 
   const task = await Task.findByIdAndUpdate(id, req.body, {
@@ -26,17 +27,17 @@ export const updateTask = asyncWrapper(async (req, res) => {
     runValidator: true,
   });
   if (!id) {
-    return res.status(404).json({ msg: "id doesn't exist" });
+    return next(createCustomError("id doesn't exist", 404));
   }
   res.status(200).json({ task });
 });
 
-export const deleteTask = asyncWrapper(async (req, res) => {
+export const deleteTask = asyncWrapper(async (req, res, next) => {
   const { id } = req.params;
 
   const task = await Task.findByIdAndDelete(id);
   if (!task) {
-    return res.status(404).json({ msg: "id doesn't exist" });
+    return next(createCustomError("id doesn't exist", 404));
   }
   res.status(200).json({ status: "success", deletedTask: task });
 });
