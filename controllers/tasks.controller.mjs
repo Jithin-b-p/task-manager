@@ -32,8 +32,25 @@ export const createTask = async (req, res) => {
   }
 };
 
-export const updateTask = (req, res) => {
-  res.send("task updated");
+export const updateTask = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const task = await Task.findById(id);
+
+    const updated = await Task.findByIdAndUpdate(id, req.body, {
+      returnDocument: "after",
+    });
+    if (!id) {
+      return res.status(404).json({ msg: "id doesn't exist" });
+    }
+    res.status(200).json({ status: "success", updatedTask: updated });
+  } catch (error) {
+    if (error.name === "CastError") {
+      return res.status(404).json({ msg: "id doesn't exist" });
+    }
+    res.status(500).json({ errorType: error.name, msg: error.message });
+  }
 };
 
 export const deleteTask = async (req, res) => {
